@@ -27,36 +27,59 @@ class VideoStream:
 from PIL import Image
 from libmaix import Camera
 import io
+import time
 
-class V831VideoCapture(VideoCapture):
 
-		def __init__(self, source="/sipeed/v831", size=(640, 480)):
-			self.source = source
-			self.width, self.height = size
-			self.cam = Camera(self.width, self.height)
+class V831VideoCapture():
 
-		def read(self):
-			return self.cam.read()  # bytes
+	def __init__(self, source="/sipeed/v831", size=(480, 360)):
+		self.source = source
+		self.width, self.height = size
+		self.cam = Camera(self.width, self.height)
 
-		def capture(self):
-			return Image.frombytes("RGB", (self.width, self.height), self.read())
+	def read(self):
+		return self.cam.read()  # bytes
 
-		def __del__(self):
-			self.cam.close()
+	def capture(self):
+		return Image.frombytes("RGB", (self.width, self.height), self.read())
+
+	def __del__(self):
+		self.cam.close()
 
 
 class VideoStream:
-  
- 	def __init__(self, filename):
+
+	def __init__(self, filename):
 		self.filename = filename
 		self.camera = V831VideoCapture()
 		self.frameNum = 0
+		tmp = None
 
 	def nextFrame(self):
-		tmp = io.BytesIO()
-		self.camera.capture().save(tmp, format='jpeg', quality=95)
 		self.frameNum += 1
-		return tmp.read()
+
+		# t0 = time.time()
+		img = self.camera.capture()
+		# t1 = time.time()
+		tmp = io.BytesIO()
+		img.save(tmp, format='jpeg', quality=80)
+		# t2 = time.time()
+		data = tmp.getvalue()
+		# print(len(data), t1 - t0, t2 - t1)
+		data = tmp.getvalue()
+		# print(len(data), time.time())
+		return data
+
+	def __nextFrame(self):
+		self.frameNum += 1
+
+		if self.tmp is None:
+			self.tmp = io.BytesIO()
+			self.camera.capture().save(self.tmp, format='jpeg', quality=80)
+
+		data = self.tmp.getvalue()
+		# print(len(data), time.time())
+		return data
 
 	def frameNbr(self):
 		"""Get frame number."""

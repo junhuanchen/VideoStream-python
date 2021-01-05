@@ -190,7 +190,7 @@ class Client:
 
 			try:
 
-				data = self.rtpSocket.recv(20480)
+				data = self.rtpSocket.recv(128*1024)
 
 				if data:
 
@@ -203,8 +203,6 @@ class Client:
 					currFrameNbr = rtpPacket.seqNum()
 
 					print("Current Seq Num: " + str(currFrameNbr))
-
-										
 
 					if currFrameNbr > self.frameNbr: # Discard the late packet
 
@@ -248,7 +246,7 @@ class Client:
 
 		file.close()
 
-		
+
 
 		return cachename
 
@@ -257,14 +255,15 @@ class Client:
 	def updateMovie(self, imageFile):
 
 		"""Update the image file as video frame in the GUI."""
+		
+		image = Image.open(imageFile)
+		# image = image.resize((image.width * 2, image.height * 2), Image.ANTIALIAS)
+  
+		photo = ImageTk.PhotoImage(image)
 
-		photo = ImageTk.PhotoImage(Image.open(imageFile))
-
-		self.label.configure(image = photo, height=288) 
+		self.label.configure(image = photo, height=image.height) 
 
 		self.label.image = photo
-
-		
 
 	def connectToServer(self):
 

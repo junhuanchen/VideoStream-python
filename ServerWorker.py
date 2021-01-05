@@ -131,9 +131,9 @@ class ServerWorker:
 						self.makeRtp(data, frameNumber), (address, port))
 				except:
 					print("Connection Error")
-					#print '-'*60
-					#traceback.print_exc(file=sys.stdout)
-					#print '-'*60
+					print('-'*60)
+					traceback.print_exc(file=sys.stdout)
+					print('-'*60)
 
 	def makeRtp(self, payload, frameNbr):
 		"""RTP-packetize the video data."""
@@ -149,7 +149,7 @@ class ServerWorker:
 		rtpPacket = RtpPacket()
 
 		rtpPacket.encode(version, padding, extension, cc,
-		                 seqnum, marker, pt, ssrc, payload)
+										seqnum, marker, pt, ssrc, payload)
 
 		return rtpPacket.getPacket()
 
